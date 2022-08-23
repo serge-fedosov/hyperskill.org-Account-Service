@@ -1,0 +1,8 @@
+content:
+- Theory
+- '@Size vs @Min @Max'
+- Request parameter validation
+- Validation annotations
+- '@Valid annotation'
+- '@NotBlank annotation'
+- Tasks

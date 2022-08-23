@@ -1,0 +1,18 @@
+<h2>Request parameter validation</h2>
+<html>
+ <head></head>
+ <body>
+  <p>Given the REST Controller:</p> 
+  <pre><code class="language-java">@RestController
+{1}
+public class BitcoinController {
+
+    @GetMapping("/bitcoins")
+    ResponseEntity&lt;String&gt; validateBitcoin(
+            @RequestParam("rate") {2} int rate) {
+        return ResponseEntity.ok("Bitcoin rate is valid.");
+    }
+}</code></pre> 
+  <p>Choose missing annotations of the <code class="language-java">BitcoinController</code> class if we want to validate that <code class="language-java">rate</code> request parameter of the method <code class="language-java">validateBitcoin</code> is higher or equal to 1000:</p>
+ </body>
+</html>
