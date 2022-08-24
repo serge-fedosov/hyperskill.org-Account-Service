@@ -367,7 +367,13 @@ files:
       };
     }
   learner_created: false
-- name: src/account/AccountServiceController.java
+- name: src/account/configurations/BCryptEncoderConfig.java
+  visible: true
+  learner_created: true
+- name: src/account/configurations/SecurityConfig.java
+  visible: true
+  learner_created: true
+- name: src/account/controllers/AccountServiceController.java
   visible: true
   text: |-
     package account;
@@ -460,6 +466,30 @@ files:
         }
     }
   learner_created: true
+- name: src/account/services/UserService.java
+  visible: true
+  learner_created: true
+- name: src/account/repositories/UserRepository.java
+  visible: true
+  learner_created: true
+- name: src/account/entities/User.java
+  visible: true
+  learner_created: true
+- name: src/account/entities/Role.java
+  visible: true
+  learner_created: true
+- name: src/account/exceptions/RestExceptionHandler.java
+  visible: true
+  learner_created: true
+- name: src/account/exceptions/models/ErrorModel.java
+  visible: true
+  learner_created: true
+- name: src/account/exceptions/UserExistException.java
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/16602#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: Wed, 24 Aug 2022 17:48:00 UTC
 record: -1

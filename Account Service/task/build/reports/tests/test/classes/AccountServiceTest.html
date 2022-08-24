@@ -41,7 +41,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">5.530s</div>
+<div class="counter">12.438s</div>
 <p>duration</p>
 </div>
 </td>
@@ -79,7 +79,7 @@
 </thead>
 <tr>
 <td class="success">start</td>
-<td class="success">5.530s</td>
+<td class="success">12.438s</td>
 <td class="success">passed</td>
 </tr>
 </table>
@@ -98,32 +98,73 @@ Start test 1?[0m
  =========|_|==============|___/=/_/_/_/
  :: Spring Boot ::        (v2.3.1.RELEASE)
 
-2022-08-20 14:33:24.848  INFO 8004 --- [    Test worker] account.AccountServiceApplication        : Starting AccountServiceApplication on DESKTOP-5U6L102 with PID 8004 (started by sergdm in C:\java\hyperskill.org\Account Service\Account Service\task)
-2022-08-20 14:33:24.868  INFO 8004 --- [    Test worker] account.AccountServiceApplication        : No active profile set, falling back to default profiles: default
-2022-08-20 14:33:27.024  INFO 8004 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 28852 (http)
-2022-08-20 14:33:27.044  INFO 8004 --- [    Test worker] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2022-08-20 14:33:27.044  INFO 8004 --- [    Test worker] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.36]
-2022-08-20 14:33:27.187  INFO 8004 --- [    Test worker] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
-2022-08-20 14:33:27.187  INFO 8004 --- [    Test worker] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2225 ms
-2022-08-20 14:33:27.608  INFO 8004 --- [    Test worker] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
-2022-08-20 14:33:28.061  INFO 8004 --- [    Test worker] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 14 endpoint(s) beneath base path '/actuator'
-2022-08-20 14:33:28.126  INFO 8004 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 28852 (http) with context path ''
-2022-08-20 14:33:28.146  INFO 8004 --- [    Test worker] account.AccountServiceApplication        : Started AccountServiceApplication in 3.905 seconds (JVM running for 5.149)
-2022-08-20 14:33:28.804  INFO 8004 --- [io-28852-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2022-08-20 14:33:28.804  INFO 8004 --- [io-28852-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2022-08-20 14:33:28.824  INFO 8004 --- [io-28852-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 20 ms
+2022-08-24 21:47:48.249  INFO 11424 --- [    Test worker] account.AccountServiceApplication        : Starting AccountServiceApplication on DESKTOP-5U6L102 with PID 11424 (started by sergdm in C:\java\hyperskill.org\Account Service\Account Service\task)
+2022-08-24 21:47:48.259  INFO 11424 --- [    Test worker] account.AccountServiceApplication        : No active profile set, falling back to default profiles: default
+2022-08-24 21:47:49.889  INFO 11424 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFERRED mode.
+2022-08-24 21:47:50.011  INFO 11424 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 102ms. Found 1 JPA repository interfaces.
+2022-08-24 21:47:50.981  INFO 11424 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 28852 (http)
+2022-08-24 21:47:51.010  INFO 11424 --- [    Test worker] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-08-24 21:47:51.011  INFO 11424 --- [    Test worker] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.36]
+2022-08-24 21:47:51.216  INFO 11424 --- [    Test worker] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-08-24 21:47:51.216  INFO 11424 --- [    Test worker] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2847 ms
+2022-08-24 21:47:51.400  INFO 11424 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-08-24 21:47:51.737  INFO 11424 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-08-24 21:47:51.747  INFO 11424 --- [    Test worker] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:file:~/account_db'
+2022-08-24 21:47:51.974  INFO 11424 --- [    Test worker] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2022-08-24 21:47:52.058  INFO 11424 --- [         task-1] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-08-24 21:47:52.132  WARN 11424 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2022-08-24 21:47:52.180  INFO 11424 --- [         task-1] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.4.17.Final
+2022-08-24 21:47:52.516  INFO 11424 --- [         task-1] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.0.Final}
+2022-08-24 21:47:52.526  INFO 11424 --- [    Test worker] o.s.s.web.DefaultSecurityFilterChain     : Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@56f9de3b, org.springframework.security.web.context.SecurityContextPersistenceFilter@4c030fe1, org.springframework.security.web.header.HeaderWriterFilter@64757d56, org.springframework.security.web.authentication.logout.LogoutFilter@1c6ac73c, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@6c24f61d, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@52433946, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@3e2d8623, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@6728370a, org.springframework.security.web.session.SessionManagementFilter@779228dc, org.springframework.security.web.access.ExceptionTranslationFilter@7e31d53b, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@3feebf9c]
+2022-08-24 21:47:52.829  INFO 11424 --- [         task-1] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
+Hibernate: create table user (id bigint not null, account_non_expired boolean not null, account_non_locked boolean not null, credentials_non_expired boolean not null, email varchar(255), enabled boolean not null, lastname varchar(255), name varchar(255), password varchar(255), username varchar(255), primary key (id))
+Hibernate: create table user_roles (user_id bigint not null, roles varchar(255))
+Hibernate: create sequence hibernate_sequence start with 1 increment by 1
+Hibernate: alter table user_roles add constraint FK55itppkw3i07do3h7qoclqd4k foreign key (user_id) references user
+2022-08-24 21:47:54.222  INFO 11424 --- [         task-1] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-08-24 21:47:54.242  INFO 11424 --- [         task-1] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2022-08-24 21:47:54.373  INFO 11424 --- [    Test worker] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 14 endpoint(s) beneath base path '/actuator'
+2022-08-24 21:47:54.443  INFO 11424 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 28852 (http) with context path ''
+2022-08-24 21:47:54.453  INFO 11424 --- [    Test worker] DeferredRepositoryInitializationListener : Triggering deferred initialization of Spring Data repositories…
+2022-08-24 21:47:54.896  INFO 11424 --- [    Test worker] DeferredRepositoryInitializationListener : Spring Data repositories initialized!
+2022-08-24 21:47:54.916  INFO 11424 --- [    Test worker] account.AccountServiceApplication        : Started AccountServiceApplication in 7.18 seconds (JVM running for 8.551)
+2022-08-24 21:47:55.341  INFO 11424 --- [io-28852-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-08-24 21:47:55.341  INFO 11424 --- [io-28852-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2022-08-24 21:47:55.351  INFO 11424 --- [io-28852-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 10 ms
+Hibernate: select user0_.id as id1_0_, user0_.account_non_expired as account_2_0_, user0_.account_non_locked as account_3_0_, user0_.credentials_non_expired as credenti4_0_, user0_.email as email5_0_, user0_.enabled as enabled6_0_, user0_.lastname as lastname7_0_, user0_.name as name8_0_, user0_.password as password9_0_, user0_.username as usernam10_0_ from user user0_ where user0_.username=?
+Hibernate: call next value for hibernate_sequence
+Hibernate: insert into user (account_non_expired, account_non_locked, credentials_non_expired, email, enabled, lastname, name, password, username, id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: insert into user_roles (user_id, roles) values (?, ?)
+Hibernate: select user0_.id as id1_0_, user0_.account_non_expired as account_2_0_, user0_.account_non_locked as account_3_0_, user0_.credentials_non_expired as credenti4_0_, user0_.email as email5_0_, user0_.enabled as enabled6_0_, user0_.lastname as lastname7_0_, user0_.name as name8_0_, user0_.password as password9_0_, user0_.username as usernam10_0_ from user user0_ where user0_.username=?
+Hibernate: select roles0_.user_id as user_id1_1_0_, roles0_.roles as roles2_1_0_ from user_roles roles0_ where roles0_.user_id=?
 ?[1;31m
 Start test 2?[0m
+Hibernate: select user0_.id as id1_0_, user0_.account_non_expired as account_2_0_, user0_.account_non_locked as account_3_0_, user0_.credentials_non_expired as credenti4_0_, user0_.email as email5_0_, user0_.enabled as enabled6_0_, user0_.lastname as lastname7_0_, user0_.name as name8_0_, user0_.password as password9_0_, user0_.username as usernam10_0_ from user user0_ where user0_.username=?
+Hibernate: select roles0_.user_id as user_id1_1_0_, roles0_.roles as roles2_1_0_ from user_roles roles0_ where roles0_.user_id=?
 ?[1;31m
 Start test 3?[0m
+Hibernate: select user0_.id as id1_0_, user0_.account_non_expired as account_2_0_, user0_.account_non_locked as account_3_0_, user0_.credentials_non_expired as credenti4_0_, user0_.email as email5_0_, user0_.enabled as enabled6_0_, user0_.lastname as lastname7_0_, user0_.name as name8_0_, user0_.password as password9_0_, user0_.username as usernam10_0_ from user user0_ where user0_.username=?
+Hibernate: select roles0_.user_id as user_id1_1_0_, roles0_.roles as roles2_1_0_ from user_roles roles0_ where roles0_.user_id=?
 ?[1;31m
 Start test 4?[0m
+Hibernate: select user0_.id as id1_0_, user0_.account_non_expired as account_2_0_, user0_.account_non_locked as account_3_0_, user0_.credentials_non_expired as credenti4_0_, user0_.email as email5_0_, user0_.enabled as enabled6_0_, user0_.lastname as lastname7_0_, user0_.name as name8_0_, user0_.password as password9_0_, user0_.username as usernam10_0_ from user user0_ where user0_.username=?
+Hibernate: select roles0_.user_id as user_id1_1_0_, roles0_.roles as roles2_1_0_ from user_roles roles0_ where roles0_.user_id=?
 ?[1;31m
 Start test 5?[0m
+Hibernate: select user0_.id as id1_0_, user0_.account_non_expired as account_2_0_, user0_.account_non_locked as account_3_0_, user0_.credentials_non_expired as credenti4_0_, user0_.email as email5_0_, user0_.enabled as enabled6_0_, user0_.lastname as lastname7_0_, user0_.name as name8_0_, user0_.password as password9_0_, user0_.username as usernam10_0_ from user user0_ where user0_.username=?
+Hibernate: call next value for hibernate_sequence
+Hibernate: insert into user (account_non_expired, account_non_locked, credentials_non_expired, email, enabled, lastname, name, password, username, id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: insert into user_roles (user_id, roles) values (?, ?)
+Hibernate: select user0_.id as id1_0_, user0_.account_non_expired as account_2_0_, user0_.account_non_locked as account_3_0_, user0_.credentials_non_expired as credenti4_0_, user0_.email as email5_0_, user0_.enabled as enabled6_0_, user0_.lastname as lastname7_0_, user0_.name as name8_0_, user0_.password as password9_0_, user0_.username as usernam10_0_ from user user0_ where user0_.username=?
+Hibernate: select roles0_.user_id as user_id1_1_0_, roles0_.roles as roles2_1_0_ from user_roles roles0_ where roles0_.user_id=?
 ?[1;31m
 Start test 6?[0m
+Hibernate: select user0_.id as id1_0_, user0_.account_non_expired as account_2_0_, user0_.account_non_locked as account_3_0_, user0_.credentials_non_expired as credenti4_0_, user0_.email as email5_0_, user0_.enabled as enabled6_0_, user0_.lastname as lastname7_0_, user0_.name as name8_0_, user0_.password as password9_0_, user0_.username as usernam10_0_ from user user0_ where user0_.username=?
+Hibernate: select roles0_.user_id as user_id1_1_0_, roles0_.roles as roles2_1_0_ from user_roles roles0_ where roles0_.user_id=?
 ?[1;31m
 Start test 7?[0m
+Hibernate: select user0_.id as id1_0_, user0_.account_non_expired as account_2_0_, user0_.account_non_locked as account_3_0_, user0_.credentials_non_expired as credenti4_0_, user0_.email as email5_0_, user0_.enabled as enabled6_0_, user0_.lastname as lastname7_0_, user0_.name as name8_0_, user0_.password as password9_0_, user0_.username as usernam10_0_ from user user0_ where user0_.username=?
+Hibernate: select roles0_.user_id as user_id1_1_0_, roles0_.roles as roles2_1_0_ from user_roles roles0_ where roles0_.user_id=?
 ?[1;31m
 Start test 8?[0m
 ?[1;31m
@@ -134,11 +175,98 @@ Start test 10?[0m
 Start test 11?[0m
 ?[1;31m
 Start test 12?[0m
-2022-08-20 14:33:29.187  WARN 8004 --- [io-28852-exec-2] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'GET' not supported]
-2022-08-20 14:33:29.200  WARN 8004 --- [io-28852-exec-3] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'PUT' not supported]
-2022-08-20 14:33:29.210  WARN 8004 --- [io-28852-exec-4] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'DELETE' not supported]
 ?[1;31m
 Start test 13?[0m
+?[1;31m
+Start test 14?[0m
+?[1;31m
+Start test 15?[0m
+?[1;31m
+Start test 16?[0m
+?[1;31m
+Start test 17?[0m
+?[1;31m
+Start test 18?[0m
+Hibernate: select user0_.id as id1_0_, user0_.account_non_expired as account_2_0_, user0_.account_non_locked as account_3_0_, user0_.credentials_non_expired as credenti4_0_, user0_.email as email5_0_, user0_.enabled as enabled6_0_, user0_.lastname as lastname7_0_, user0_.name as name8_0_, user0_.password as password9_0_, user0_.username as usernam10_0_ from user user0_ where user0_.username=?
+Hibernate: select roles0_.user_id as user_id1_1_0_, roles0_.roles as roles2_1_0_ from user_roles roles0_ where roles0_.user_id=?
+?[1;31m
+Start test 19?[0m
+Hibernate: select user0_.id as id1_0_, user0_.account_non_expired as account_2_0_, user0_.account_non_locked as account_3_0_, user0_.credentials_non_expired as credenti4_0_, user0_.email as email5_0_, user0_.enabled as enabled6_0_, user0_.lastname as lastname7_0_, user0_.name as name8_0_, user0_.password as password9_0_, user0_.username as usernam10_0_ from user user0_ where user0_.username=?
+Hibernate: select roles0_.user_id as user_id1_1_0_, roles0_.roles as roles2_1_0_ from user_roles roles0_ where roles0_.user_id=?
+?[1;31m
+Start test 20?[0m
+Hibernate: select user0_.id as id1_0_, user0_.account_non_expired as account_2_0_, user0_.account_non_locked as account_3_0_, user0_.credentials_non_expired as credenti4_0_, user0_.email as email5_0_, user0_.enabled as enabled6_0_, user0_.lastname as lastname7_0_, user0_.name as name8_0_, user0_.password as password9_0_, user0_.username as usernam10_0_ from user user0_ where user0_.username=?
+Hibernate: select roles0_.user_id as user_id1_1_0_, roles0_.roles as roles2_1_0_ from user_roles roles0_ where roles0_.user_id=?
+?[1;31m
+Start test 21?[0m
+Hibernate: select user0_.id as id1_0_, user0_.account_non_expired as account_2_0_, user0_.account_non_locked as account_3_0_, user0_.credentials_non_expired as credenti4_0_, user0_.email as email5_0_, user0_.enabled as enabled6_0_, user0_.lastname as lastname7_0_, user0_.name as name8_0_, user0_.password as password9_0_, user0_.username as usernam10_0_ from user user0_ where user0_.username=?
+Hibernate: select roles0_.user_id as user_id1_1_0_, roles0_.roles as roles2_1_0_ from user_roles roles0_ where roles0_.user_id=?
+?[1;31m
+Start test 22?[0m
+Hibernate: select user0_.id as id1_0_, user0_.account_non_expired as account_2_0_, user0_.account_non_locked as account_3_0_, user0_.credentials_non_expired as credenti4_0_, user0_.email as email5_0_, user0_.enabled as enabled6_0_, user0_.lastname as lastname7_0_, user0_.name as name8_0_, user0_.password as password9_0_, user0_.username as usernam10_0_ from user user0_ where user0_.username=?
+Hibernate: select roles0_.user_id as user_id1_1_0_, roles0_.roles as roles2_1_0_ from user_roles roles0_ where roles0_.user_id=?
+?[1;31m
+Start test 23?[0m
+Hibernate: select user0_.id as id1_0_, user0_.account_non_expired as account_2_0_, user0_.account_non_locked as account_3_0_, user0_.credentials_non_expired as credenti4_0_, user0_.email as email5_0_, user0_.enabled as enabled6_0_, user0_.lastname as lastname7_0_, user0_.name as name8_0_, user0_.password as password9_0_, user0_.username as usernam10_0_ from user user0_ where user0_.username=?
+Hibernate: select roles0_.user_id as user_id1_1_0_, roles0_.roles as roles2_1_0_ from user_roles roles0_ where roles0_.user_id=?
+?[1;31m
+Start test 24?[0m
+Hibernate: select user0_.id as id1_0_, user0_.account_non_expired as account_2_0_, user0_.account_non_locked as account_3_0_, user0_.credentials_non_expired as credenti4_0_, user0_.email as email5_0_, user0_.enabled as enabled6_0_, user0_.lastname as lastname7_0_, user0_.name as name8_0_, user0_.password as password9_0_, user0_.username as usernam10_0_ from user user0_ where user0_.username=?
+?[1;31m
+Start test 25?[0m
+Hibernate: select user0_.id as id1_0_, user0_.account_non_expired as account_2_0_, user0_.account_non_locked as account_3_0_, user0_.credentials_non_expired as credenti4_0_, user0_.email as email5_0_, user0_.enabled as enabled6_0_, user0_.lastname as lastname7_0_, user0_.name as name8_0_, user0_.password as password9_0_, user0_.username as usernam10_0_ from user user0_ where user0_.username=?
+Hibernate: select roles0_.user_id as user_id1_1_0_, roles0_.roles as roles2_1_0_ from user_roles roles0_ where roles0_.user_id=?
+?[1;31m
+Start test 26?[0m
+Hibernate: select user0_.id as id1_0_, user0_.account_non_expired as account_2_0_, user0_.account_non_locked as account_3_0_, user0_.credentials_non_expired as credenti4_0_, user0_.email as email5_0_, user0_.enabled as enabled6_0_, user0_.lastname as lastname7_0_, user0_.name as name8_0_, user0_.password as password9_0_, user0_.username as usernam10_0_ from user user0_ where user0_.username=?
+?[1;31m
+Start test 27?[0m
+?[1;31m
+Start test 28?[0m
+2022-08-24 21:47:57.688  INFO 11424 --- [     Thread-336] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2022-08-24 21:47:57.688  INFO 11424 --- [     Thread-336] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+2022-08-24 21:47:57.688  INFO 11424 --- [     Thread-336] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2022-08-24 21:47:57.742  INFO 11424 --- [     Thread-336] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::        (v2.3.1.RELEASE)
+
+2022-08-24 21:47:57.822  INFO 11424 --- [    Test worker] account.AccountServiceApplication        : Starting AccountServiceApplication on DESKTOP-5U6L102 with PID 11424 (started by sergdm in C:\java\hyperskill.org\Account Service\Account Service\task)
+2022-08-24 21:47:57.822  INFO 11424 --- [    Test worker] account.AccountServiceApplication        : No active profile set, falling back to default profiles: default
+2022-08-24 21:47:58.500  INFO 11424 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFERRED mode.
+2022-08-24 21:47:58.530  INFO 11424 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 20ms. Found 1 JPA repository interfaces.
+2022-08-24 21:47:58.670  INFO 11424 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 28852 (http)
+2022-08-24 21:47:58.670  INFO 11424 --- [    Test worker] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2022-08-24 21:47:58.670  INFO 11424 --- [    Test worker] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.36]
+2022-08-24 21:47:58.730  INFO 11424 --- [    Test worker] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2022-08-24 21:47:58.730  INFO 11424 --- [    Test worker] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 898 ms
+2022-08-24 21:47:58.795  INFO 11424 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2022-08-24 21:47:58.800  INFO 11424 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2022-08-24 21:47:58.800  INFO 11424 --- [    Test worker] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:file:~/account_db'
+2022-08-24 21:47:58.870  INFO 11424 --- [    Test worker] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2022-08-24 21:47:58.880  INFO 11424 --- [         task-1] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-08-24 21:47:58.900  INFO 11424 --- [         task-1] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
+2022-08-24 21:47:58.930  WARN 11424 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2022-08-24 21:47:58.980  INFO 11424 --- [    Test worker] o.s.s.web.DefaultSecurityFilterChain     : Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@58fbfefb, org.springframework.security.web.context.SecurityContextPersistenceFilter@31cddb11, org.springframework.security.web.header.HeaderWriterFilter@4a34de5e, org.springframework.security.web.authentication.logout.LogoutFilter@78a34c47, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@77648321, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@510bd87a, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@3d213a2b, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@1db9c2cf, org.springframework.security.web.session.SessionManagementFilter@48da5106, org.springframework.security.web.access.ExceptionTranslationFilter@9fd3b61, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@219a2203]
+2022-08-24 21:47:59.137  INFO 11424 --- [         task-1] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-08-24 21:47:59.137  INFO 11424 --- [         task-1] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2022-08-24 21:47:59.290  INFO 11424 --- [    Test worker] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 14 endpoint(s) beneath base path '/actuator'
+2022-08-24 21:47:59.320  INFO 11424 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 28852 (http) with context path ''
+2022-08-24 21:47:59.320  INFO 11424 --- [    Test worker] DeferredRepositoryInitializationListener : Triggering deferred initialization of Spring Data repositories…
+2022-08-24 21:47:59.380  INFO 11424 --- [    Test worker] DeferredRepositoryInitializationListener : Spring Data repositories initialized!
+2022-08-24 21:47:59.391  INFO 11424 --- [    Test worker] account.AccountServiceApplication        : Started AccountServiceApplication in 1.61 seconds (JVM running for 13.029)
+?[1;31m
+Start test 29?[0m
+2022-08-24 21:47:59.401  INFO 11424 --- [io-28852-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2022-08-24 21:47:59.401  INFO 11424 --- [io-28852-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2022-08-24 21:47:59.401  INFO 11424 --- [io-28852-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+Hibernate: select user0_.id as id1_0_, user0_.account_non_expired as account_2_0_, user0_.account_non_locked as account_3_0_, user0_.credentials_non_expired as credenti4_0_, user0_.email as email5_0_, user0_.enabled as enabled6_0_, user0_.lastname as lastname7_0_, user0_.name as name8_0_, user0_.password as password9_0_, user0_.username as usernam10_0_ from user user0_ where user0_.username=?
+Hibernate: select roles0_.user_id as user_id1_1_0_, roles0_.roles as roles2_1_0_ from user_roles roles0_ where roles0_.user_id=?
 </pre>
 </span>
 </div>
@@ -150,7 +278,7 @@ Start test 13?[0m
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 7.3.3</a> at 20 авг. 2022 г., 14:33:29</p>
+<a href="http://www.gradle.org">Gradle 7.3.3</a> at 24 авг. 2022 г., 21:47:59</p>
 </div>
 </div>
 </body>
