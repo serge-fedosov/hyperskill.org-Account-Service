@@ -10,45 +10,31 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.persistence.EntityNotFoundException;
-import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @RestControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
-//    @Override
-//    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-//        ErrorModel error = new ErrorModel(HttpStatus.BAD_REQUEST, "Validation Error", ex.getBindingResult().toString());
-//
-//        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-//    }
-//
-//    @ExceptionHandler(EntityNotFoundException.class)
-//    private ResponseEntity<ErrorModel> handleEntityNotFound(EntityNotFoundException ex){
-//        ErrorModel error = new ErrorModel(HttpStatus.NOT_FOUND, "Entity not found", ex.getMessage());
-//
-//        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-//    }
+    @Override
+    public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-//    @ExceptionHandler(UserExistException.class)
-//    private ResponseEntity<ErrorModel> handleUserExist(UserExistException ex, WebRequest request){
-////        ErrorModel error = new ErrorModel(HttpStatus.BAD_REQUEST.value(), e.getMessage(), request.getDescription(false));
-//        ErrorModel error = new ErrorModel(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), request.getDescription(false));
-//
-//        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-//    }
+        List<String> errorMessages = new ArrayList<>();
+        for (var error : ex.getBindingResult().getAllErrors()) {
+            errorMessages.add(error.getDefaultMessage());
+        }
 
-    @ExceptionHandler(UserExistException.class)
-    protected ResponseEntity<Object> handleUserExist(UserExistException ex, WebRequest request) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("timestamp", LocalDateTime.now());
-        body.put("error", "Bad Request");
-        body.put("message", ex.getMessage());
-        body.put("path", request.getDescription(false));
+        String message = (errorMessages.size() == 1) ? errorMessages.get(0) : errorMessages.toString();
+        ErrorModel error = new ErrorModel(HttpStatus.BAD_REQUEST.value(), message, request.getDescription(false));
 
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UserException.class)
+    protected ResponseEntity<ErrorModel> handleUserException(UserException ex, WebRequest request) {
+        ErrorModel error = new ErrorModel(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), request.getDescription(false));
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 }

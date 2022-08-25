@@ -1,28 +1,32 @@
 package account.exceptions.models;
 
-import org.springframework.http.HttpStatus;
-
 import java.time.LocalDateTime;
 
 public class ErrorModel {
 
-    private HttpStatus httpStatus;
+    private int status;
 
     private LocalDateTime timestamp;
 
     private String message;
+    private String error;
 
-    private String details;
+    private String path;
 
-    public ErrorModel(HttpStatus httpStatus, String message, String details) {
+    public ErrorModel(int status, String message, String path) {
         this.timestamp = LocalDateTime.now();
-        this.httpStatus = httpStatus;
+        this.status = status;
         this.message = message;
-        this.details = details;
+        this.error = "Bad Request";
+
+        if (path.startsWith("uri=")) {
+            path = path.substring(4);
+        }
+        this.path = path;
     }
 
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
+    public int getStatus() {
+        return status;
     }
 
     public LocalDateTime getTimestamp() {
@@ -33,7 +37,11 @@ public class ErrorModel {
         return message;
     }
 
-    public String getDetails() {
-        return details;
+    public String getError() {
+        return error;
+    }
+
+    public String getPath() {
+        return path;
     }
 }

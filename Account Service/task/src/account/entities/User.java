@@ -5,6 +5,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +22,8 @@ public class User implements UserDetails {
     private String lastname;
     private String email;
 
+    @NotBlank
+    @Size(min = 12)
     private String password;
 
     private boolean accountNonExpired;
