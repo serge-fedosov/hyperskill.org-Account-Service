@@ -2,14 +2,12 @@ package account.controllers;
 
 import account.entities.Role;
 import account.entities.User;
-import account.exceptions.UserException;
+import account.exceptions.AccountServiceException;
 import account.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestController
-public class AccountServiceController {
+public class UserController {
 
     @Autowired
     private UserRepository userRepository;
@@ -31,17 +29,22 @@ public class AccountServiceController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @GetMapping("/api/empl/payment")
-    public Map<String, Object> testAuth(@AuthenticationPrincipal User user) {
-        return createResponse(user);
-    }
+//    @GetMapping("/api/empl/payment")
+//    public Map<String, Object> testAuth(@AuthenticationPrincipal User user) {
+//        return createResponse(user);
+//    }
 
     @PostMapping("/api/auth/signup")
     public Map<String, Object> createUser(@Valid @RequestBody UserRegistration userRegistration) {
 
+        String password = userRegistration.getPassword();
+        if (isPasswordInBreachedList(password)) {
+            throw new AccountServiceException("The password is in the hacker's database!");
+        }
+
         String username = userRegistration.getEmail().toLowerCase();
         if (userRepository.findByUsername(username).isPresent()) {
-            throw new UserException("User exist!");
+            throw new AccountServiceException("User exist!");
         }
 
         User user = new User();
@@ -49,12 +52,6 @@ public class AccountServiceController {
         user.setName(userRegistration.getName());
         user.setLastname(userRegistration.getLastname());
         user.setEmail(userRegistration.getEmail());
-
-        String password = userRegistration.getPassword();
-        if (isPasswordInBreachedList(password)) {
-            throw new UserException("The password is in the hacker's database!");
-        }
-
         user.setPassword(passwordEncoder.encode(password));
         user.grantAuthority(Role.ROLE_USER);
         userRepository.save(user);
@@ -70,11 +67,11 @@ public class AccountServiceController {
 
         String password = newPassword.getNew_password();
         if (isPasswordInBreachedList(password)) {
-            throw new UserException("The password is in the hacker's database!");
+            throw new AccountServiceException("The password is in the hacker's database!");
         }
 
         if (passwordEncoder.matches(password, user.getPassword())) {
-            throw new UserException("The passwords must be different!");
+            throw new AccountServiceException("The passwords must be different!");
         }
 
         user.setPassword(passwordEncoder.encode(password));
