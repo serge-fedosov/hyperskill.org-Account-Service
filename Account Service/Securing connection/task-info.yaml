@@ -137,6 +137,1989 @@ files:
       };
     }
   learner_created: false
+- name: src/resources/banner.txt
+  visible: true
+  text: " __    __   __          __    __       _______. __  \n|  |  |  | |  |   \
+    \     |  |  |  |     /       ||  | \n|  |__|  | |  |        |  |__|  |    |  \
+    \ (----`|  | \n|   __   | |  |        |   __   |     \\   \\    |  | \n|  |  |\
+    \  | |  |  __    |  |  |  | .----)   |   |__| \n|__|  |__| |__| (_ )   |__|  |__|\
+    \ |_______/    (__) \n                 |/           \n :: Spring Boot ::     \
+    \            (v2.3.1.RELEASE)\n"
+  learner_created: true
+- name: src/account/dto/UserAccessDTO.java
+  visible: true
+  text: |
+    package account.dto;
+
+    public class UserAccessDTO {
+        private String user;
+        private String operation;
+
+        public UserAccessDTO() {
+        }
+
+        public String getUser() {
+            return user;
+        }
+
+        public void setUser(String user) {
+            this.user = user;
+        }
+
+        public String getOperation() {
+            return operation;
+        }
+
+        public void setOperation(String operation) {
+            this.operation = operation;
+        }
+    }
+  learner_created: true
+- name: src/account/controllers/UserController.java
+  visible: true
+  text: |
+    package account.controllers;
+
+    import account.dto.UserDTO;
+    import account.dto.UserDTO2;
+    import account.entities.User;
+    import account.services.UserService;
+    import org.modelmapper.ModelMapper;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.security.crypto.password.PasswordEncoder;
+    import org.springframework.web.bind.annotation.PostMapping;
+    import org.springframework.web.bind.annotation.RequestBody;
+    import org.springframework.web.bind.annotation.RestController;
+
+    import javax.validation.Valid;
+    import javax.validation.constraints.NotBlank;
+    import javax.validation.constraints.Size;
+    import java.util.LinkedHashMap;
+    import java.util.Map;
+
+    @RestController
+    public class UserController {
+
+        private final UserService userService;
+        private final PasswordEncoder passwordEncoder;
+        private final ModelMapper modelMapper;
+
+        @Autowired
+        public UserController(UserService userService, PasswordEncoder passwordEncoder, ModelMapper modelMapper) {
+            this.userService = userService;
+            this.passwordEncoder = passwordEncoder;
+            this.modelMapper = modelMapper;
+        }
+
+        @PostMapping("/api/auth/signup")
+        public UserDTO2 createUser(@Valid @RequestBody UserDTO userDTO) {
+            return userService.create(userDTO);
+        }
+
+        @PostMapping("/api/auth/changepass")
+        public Map<String, String> changePassword(@Valid @RequestBody NewUserPassword newPassword) {
+            // TODO FIX IT! передавать пароль в строке, убрать NewUserPassword
+            String password = newPassword.getNew_password();
+            return userService.changePassword(password);
+        }
+
+        public Map<String, Object> createResponse(User user) {
+            Map<String, Object> response = new LinkedHashMap<>();
+            response.put("id", user.getId());
+            response.put("name", user.getName());
+            response.put("lastname", user.getLastname());
+            response.put("email", user.getEmail());
+            response.put("roles", user.getRoles());
+
+            return response;
+        }
+
+        private User convertToUser(UserDTO userDTO) {
+            return modelMapper.map(userDTO, User.class);
+        }
+
+        private UserDTO convertToUserDTO(User user) {
+            return modelMapper.map(user, UserDTO.class);
+        }
+
+        private UserDTO2 convertToUserDTO2(User user) {
+            return modelMapper.map(user, UserDTO2.class);
+        }
+    }
+
+    class NewUserPassword {
+        @NotBlank(message = "Empty password field!")
+        @Size(min = 12, message = "Password length must be 12 chars minimum!")
+        private String new_password;
+
+        public NewUserPassword() {
+        }
+
+        public String getNew_password() {
+            return new_password;
+        }
+
+        public void setNew_password(String new_password) {
+            this.new_password = new_password;
+        }
+    }
+  learner_created: true
+- name: src/account/controllers/AdminController.java
+  visible: true
+  text: |
+    package account.controllers;
+
+    import account.dto.UserAccessDTO;
+    import account.dto.UserDTO2;
+    import account.dto.UserRoleDTO;
+    import account.services.UserService;
+    import org.springframework.web.bind.annotation.*;
+
+    import java.util.LinkedHashMap;
+    import java.util.Map;
+
+    @RestController
+    public class AdminController {
+
+        private final UserService userService;
+
+        public AdminController(UserService userService) {
+            this.userService = userService;
+        }
+
+        @GetMapping("/api/admin/user")
+        public Object getUsers() {
+            return userService.findAllUsers();
+        }
+
+        //    public Map<String, String> delete(@RequestParam(required = true) String userEmail) {
+        @DeleteMapping("/api/admin/user/{userEmail}")
+        public Map<String, String> delete(@PathVariable String userEmail) {
+            userService.delete(userEmail);
+
+            Map<String, String> response = new LinkedHashMap<>();
+            response.put("user", userEmail);
+            response.put("status", "Deleted successfully!");
+
+            return response;
+        }
+
+        @PutMapping("/api/admin/user/role")
+        public UserDTO2 setRole(@RequestBody(required = true) UserRoleDTO userRoleDTO) {
+            return userService.setRole(userRoleDTO);
+        }
+
+        @PutMapping("/api/admin/user/access")
+        public Map<String, String> setAccess(@RequestBody(required = true) UserAccessDTO userAccessDTO) {
+            Map<String, String> response = new LinkedHashMap<>();
+            response.put("status", userService.setAccess(userAccessDTO));
+
+            return response;
+        }
+    }
+  learner_created: true
+- name: src/account/exceptions/AccessDeniedHandlerImpl.java
+  visible: true
+  text: |-
+    package account.exceptions;
+
+    import account.entities.Event;
+    import account.entities.Events;
+    import account.entities.User;
+    import account.services.EventService;
+    import com.fasterxml.jackson.databind.ObjectMapper;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.security.access.AccessDeniedException;
+    import org.springframework.security.core.Authentication;
+    import org.springframework.security.core.context.SecurityContextHolder;
+    import org.springframework.security.web.access.AccessDeniedHandler;
+
+    import javax.servlet.http.HttpServletRequest;
+    import javax.servlet.http.HttpServletResponse;
+    import java.io.IOException;
+    import java.time.LocalDateTime;
+    import java.util.LinkedHashMap;
+
+    public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
+
+        @Autowired
+        private EventService eventService;
+
+        private ObjectMapper objectMapper = new ObjectMapper();
+
+        @Override
+        public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+
+            LinkedHashMap<String, Object> data = new LinkedHashMap<>();
+            data.put("timestamp", LocalDateTime.now().toString());
+            data.put("status", HttpStatus.FORBIDDEN.value());
+            data.put("error", "Forbidden");
+            data.put("message", "Access Denied!");
+            data.put("path",  request.getRequestURI());
+
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            User user = (User) auth.getPrincipal();
+
+            Event event = new Event(LocalDateTime.now(), Events.ACCESS_DENIED.toString(), user.getUsername(), request.getRequestURI(), request.getRequestURI());
+            eventService.save(event);
+
+            response.getOutputStream().println(objectMapper.writeValueAsString(data));
+        }
+    }
+  learner_created: true
+- name: src/account/entities/Event.java
+  visible: true
+  text: |
+    package account.entities;
+
+    import javax.persistence.*;
+    import java.time.LocalDateTime;
+
+    @Entity
+    public class Event {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private int id;
+        private LocalDateTime date;
+        private String action;
+        private String subject;
+        private String object;
+        private String path;
+
+        public Event() {
+        }
+
+        public Event(LocalDateTime date, String action, String subject, String object, String path) {
+            this.date = date;
+            this.action = action;
+            this.subject = subject;
+            this.object = object;
+            this.path = path;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public LocalDateTime getDate() {
+            return date;
+        }
+
+        public void setDate(LocalDateTime date) {
+            this.date = date;
+        }
+
+        public String getAction() {
+            return action;
+        }
+
+        public void setAction(String action) {
+            this.action = action;
+        }
+
+        public String getSubject() {
+            return subject;
+        }
+
+        public void setSubject(String subject) {
+            this.subject = subject;
+        }
+
+        public String getObject() {
+            return object;
+        }
+
+        public void setObject(String object) {
+            this.object = object;
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        public void setPath(String path) {
+            this.path = path;
+        }
+    }
+  learner_created: true
+- name: src/account/configurations/SecurityConfig.java
+  visible: true
+  text: |
+    package account.configurations;
+
+    import account.exceptions.AccessDeniedHandlerImpl;
+    import account.exceptions.CustomAuthenticationEntryPoint;
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.http.HttpMethod;
+    import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+    import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+    import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+    import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+    import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+    import org.springframework.security.config.http.SessionCreationPolicy;
+    import org.springframework.security.core.userdetails.UserDetailsService;
+    import org.springframework.security.crypto.password.PasswordEncoder;
+    import org.springframework.security.web.access.AccessDeniedHandler;
+
+    @Configuration
+    @EnableWebSecurity
+    public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+        private final UserDetailsService userDetailsService;
+        private final PasswordEncoder passwordEncoder;
+        private final CustomAuthenticationEntryPoint unauthorizedHandler;
+        public SecurityConfig(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder, CustomAuthenticationEntryPoint unauthorizedHandler) {
+            this.userDetailsService = userDetailsService;
+            this.passwordEncoder = passwordEncoder;
+            this.unauthorizedHandler = unauthorizedHandler;
+        }
+
+        @Override
+        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+            auth.authenticationProvider(authenticationProvider());
+        }
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            http
+                .httpBasic()
+                .authenticationEntryPoint(unauthorizedHandler) // !!!
+                .and()
+                .csrf().disable().headers().frameOptions().disable() // for Postman, the H2 console
+                .and()
+                .authorizeRequests()
+                .antMatchers("/h2-console/**").permitAll()
+                .and()
+                .authorizeRequests()
+                .antMatchers(HttpMethod.POST, "/actuator/shutdown").permitAll()
+
+                // ADMINISTRATOR
+                .and()
+                .authorizeRequests()
+                .mvcMatchers(HttpMethod.GET, "/api/admin/user").hasAnyRole("ADMINISTRATOR")
+                .and()
+                .authorizeRequests()
+                .mvcMatchers(HttpMethod.DELETE, "/api/admin/user/**").hasAnyRole("ADMINISTRATOR")
+                .and()
+                .authorizeRequests()
+                .mvcMatchers(HttpMethod.PUT, "/api/admin/user/role", "/api/admin/user/access").hasAnyRole("ADMINISTRATOR")
+
+                // AUDITOR
+                .and()
+                .authorizeRequests()
+                .mvcMatchers(HttpMethod.GET, "/api/security/events").hasAnyRole("AUDITOR")
+
+                // ACCOUNTANT
+                .and()
+                .authorizeRequests()
+                .mvcMatchers(HttpMethod.POST, "/api/acct/payments").hasAnyRole("ACCOUNTANT")
+                .and()
+                .authorizeRequests()
+                .mvcMatchers(HttpMethod.PUT, "/api/acct/payments").hasAnyRole("ACCOUNTANT")
+
+                // USER, ACCOUNTANT
+                .and()
+                .authorizeRequests()
+                .mvcMatchers(HttpMethod.GET, "/api/empl/payment").hasAnyRole("USER", "ACCOUNTANT")
+
+                // USER, ACCOUNTANT, ADMINISTRATOR
+                .and()
+                .authorizeRequests()
+                .mvcMatchers(HttpMethod.POST, "api/auth/changepass").hasAnyRole("USER", "ACCOUNTANT", "ADMINISTRATOR")
+
+                // ANONYMOUS, USER, ACCOUNTANT, ADMINISTRATOR
+                .and()
+                .authorizeRequests()
+                .mvcMatchers(HttpMethod.POST, "/api/auth/signup").permitAll()
+
+                .and()
+                .authorizeRequests()
+                .anyRequest().authenticated()
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // no session
+
+                .and()
+                .exceptionHandling()
+                .accessDeniedHandler(accessDeniedHandler());
+        }
+
+        @Bean
+        public DaoAuthenticationProvider authenticationProvider(){
+            DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+            provider.setPasswordEncoder(passwordEncoder);
+            provider.setUserDetailsService(userDetailsService);
+            return provider;
+        }
+
+        @Bean
+        public AccessDeniedHandler accessDeniedHandler() {
+            return new AccessDeniedHandlerImpl();
+        }
+    }
+  learner_created: true
+- name: src/account/controllers/AuditorController.java
+  visible: true
+  text: |
+    package account.controllers;
+
+    import account.entities.Event;
+    import account.services.EventService;
+    import org.springframework.web.bind.annotation.GetMapping;
+    import org.springframework.web.bind.annotation.RestController;
+
+    import java.util.List;
+
+    @RestController
+    public class AuditorController {
+
+        private final EventService eventService;
+
+        public AuditorController(EventService eventService) {
+            this.eventService = eventService;
+        }
+
+        @GetMapping("/api/security/events")
+        public List<Event> getSecurityEvents() {
+            return eventService.findAll();
+        }
+
+    }
+  learner_created: true
+- name: src/account/configurations/BCryptEncoderConfig.java
+  visible: true
+  text: |
+    package account.configurations;
+
+    import org.springframework.context.annotation.Bean;
+    import org.springframework.context.annotation.Configuration;
+    import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+    @Configuration
+    public class BCryptEncoderConfig {
+
+        @Bean
+        public BCryptPasswordEncoder passwordEncoder(){
+            return new BCryptPasswordEncoder();
+        }
+    }
+  learner_created: true
+- name: src/account/exceptions/models/ErrorModel.java
+  visible: true
+  text: |
+    package account.exceptions.models;
+
+    import java.time.LocalDateTime;
+
+    public class ErrorModel {
+
+        private int status;
+
+        private LocalDateTime timestamp;
+
+        private String message;
+        private String error;
+
+        private String path;
+
+        public ErrorModel(int status, String message, String path) {
+            this.timestamp = LocalDateTime.now();
+            this.status = status;
+            this.message = message;
+            this.error = "Bad Request";
+
+            if (path.startsWith("uri=")) {
+                path = path.substring(4);
+            }
+            this.path = path;
+        }
+
+        public ErrorModel(int status, String message, String path, String error) {
+            this(status, message, path);
+
+            this.error = error;
+        }
+
+        public int getStatus() {
+            return status;
+        }
+
+        public LocalDateTime getTimestamp() {
+            return timestamp;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public String getError() {
+            return error;
+        }
+
+        public String getPath() {
+            return path;
+        }
+    }
+  learner_created: true
+- name: src/account/exceptions/NotFoundException.java
+  visible: true
+  text: |
+    package account.exceptions;
+
+    public class NotFoundException extends RuntimeException {
+
+        public NotFoundException(String message) {
+            super(message);
+        }
+    }
+  learner_created: true
+- name: src/account/repositories/EventRepository.java
+  visible: true
+  text: |
+    package account.repositories;
+
+    import account.entities.Event;
+    import org.springframework.data.jpa.repository.JpaRepository;
+
+    public interface EventRepository extends JpaRepository<Event, Long> {
+    }
+  learner_created: true
+- name: src/account/exceptions/AccountServiceException.java
+  visible: true
+  text: |-
+    package account.exceptions;
+
+    public class AccountServiceException extends RuntimeException {
+
+        public AccountServiceException(String message) {
+            super(message);
+        }
+    }
+  learner_created: true
+- name: src/account/entities/Employee.java
+  visible: true
+  text: |
+    package account.entities;
+
+    import javax.persistence.*;
+    import javax.validation.constraints.Min;
+    import javax.validation.constraints.NotBlank;
+    import javax.validation.constraints.Pattern;
+
+    @Entity
+    @Table(name = "employee")
+    public class Employee {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Column(name = "id")
+        private long id;
+
+        @NotBlank(message = "Empty employee field!")
+        @Column(name = "employee")
+        private String employee;
+
+        @NotBlank(message = "Empty period field!")
+        @Pattern(regexp = "(0[1-9]|1[0-2])-\\d{4}", message = "Wrong period field!")
+        @Column(name = "period")
+        private String period;
+
+        @Min(value = 0, message = "Salary cannot be negative")
+        @Column(name = "salary")
+        private long salary;
+
+        public Employee() {
+        }
+
+        public Employee(String employee, String period, long salary) {
+            this.employee = employee;
+            this.period = period;
+            this.salary = salary;
+        }
+
+        public String getEmployee() {
+            return employee;
+        }
+
+        public void setEmployee(String employee) {
+            this.employee = employee;
+        }
+
+        public String getPeriod() {
+            return period;
+        }
+
+        public void setPeriod(String period) {
+            this.period = period;
+        }
+
+        public long getSalary() {
+            return salary;
+        }
+
+        public void setSalary(long salary) {
+            this.salary = salary;
+        }
+    }
+  learner_created: true
+- name: src/account/entities/Events.java
+  visible: true
+  text: |
+    package account.entities;
+
+    public enum Events {
+        CREATE_USER,
+        CHANGE_PASSWORD,
+        ACCESS_DENIED,
+        LOGIN_FAILED,
+        GRANT_ROLE,
+        REMOVE_ROLE,
+        LOCK_USER,
+        UNLOCK_USER,
+        DELETE_USER,
+        BRUTE_FORCE
+    }
+  learner_created: true
+- name: src/account/services/EventService.java
+  visible: true
+  text: |
+    package account.services;
+
+    import account.entities.Event;
+    import account.repositories.EventRepository;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Service;
+    import org.springframework.transaction.annotation.Transactional;
+
+    import java.util.List;
+
+    @Service
+    @Transactional(readOnly = true)
+    public class EventService {
+
+        private final EventRepository eventRepository;
+
+        @Autowired
+        public EventService(EventRepository eventRepository) {
+            this.eventRepository = eventRepository;
+        }
+
+        public List<Event> findAll() {
+            return eventRepository.findAll();
+        }
+
+        @Transactional
+        public void save(Event event) {
+            eventRepository.save(event);
+        }
+
+    }
+  learner_created: true
+- name: src/account/dto/UserRoleDTO.java
+  visible: true
+  text: |
+    package account.dto;
+
+    public class UserRoleDTO {
+
+        private String user;
+        private String role;
+        private String operation;
+
+        public UserRoleDTO() {
+        }
+
+        public String getUser() {
+            return user;
+        }
+
+        public void setUser(String user) {
+            this.user = user;
+        }
+
+        public String getRole() {
+            return role;
+        }
+
+        public void setRole(String role) {
+            this.role = role;
+        }
+
+        public String getOperation() {
+            return operation;
+        }
+
+        public void setOperation(String operation) {
+            this.operation = operation;
+        }
+    }
+  learner_created: true
+- name: src/account/dto/UserDTO.java
+  visible: true
+  text: |
+    package account.dto;
+
+    import account.entities.Role;
+
+    import javax.persistence.ElementCollection;
+    import javax.persistence.EnumType;
+    import javax.persistence.Enumerated;
+    import javax.persistence.FetchType;
+    import javax.validation.constraints.Email;
+    import javax.validation.constraints.NotBlank;
+    import javax.validation.constraints.Pattern;
+    import javax.validation.constraints.Size;
+    import java.util.List;
+
+    public class UserDTO {
+
+        @NotBlank(message = "Empty name field!")
+        private String name;
+        @NotBlank(message = "Empty lastname field!")
+        private String lastname;
+        @NotBlank(message = "Empty email field!")
+        @Email
+        @Pattern(regexp = ".+@acme.com", message = "Wrong email!")
+        private String email;
+        @NotBlank(message = "Empty password field!")
+        @Size(min = 12, message = "The password length must be at least 12 chars!")
+        private String password;
+
+        @Enumerated(EnumType.STRING)
+        @ElementCollection(fetch = FetchType.EAGER)
+        private List<Role> roles;
+
+        public UserDTO() {
+        }
+
+        public UserDTO(String name, String lastname, String email, String password, List<Role> roles) {
+            this.name = name;
+            this.lastname = lastname;
+            this.email = email;
+            this.password = password;
+            this.roles = roles;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getLastname() {
+            return lastname;
+        }
+
+        public void setLastname(String lastname) {
+            this.lastname = lastname;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email.toLowerCase();
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        public List<Role> getRoles() {
+            return roles;
+        }
+
+        public void setRoles(List<Role> roles) {
+            this.roles = roles;
+        }
+    }
+  learner_created: true
+- name: src/account/dto/EmployeeReceiveDTO.java
+  visible: true
+  text: |
+    package account.dto;
+
+    import javax.validation.constraints.Min;
+    import javax.validation.constraints.NotBlank;
+    import javax.validation.constraints.Pattern;
+
+    public class EmployeeReceiveDTO {
+
+        @NotBlank(message = "Empty employee field!")
+        private String employee;
+
+        @NotBlank(message = "Empty period field!")
+        @Pattern(regexp = "(0[1-9]|1[0-2])-\\d{4}", message = "Wrong period field!")
+        private String period;
+        @Min(value = 0, message = "Salary cannot be negative")
+        private long salary;
+
+        public EmployeeReceiveDTO() {
+        }
+
+        public EmployeeReceiveDTO(String employee, String period, long salary) {
+            this.employee = employee;
+            this.period = period;
+            this.salary = salary;
+        }
+
+        public String getEmployee() {
+            return employee;
+        }
+
+        public void setEmployee(String employee) {
+            this.employee = employee;
+        }
+
+        public String getPeriod() {
+            return period;
+        }
+
+        public void setPeriod(String period) {
+            this.period = period;
+        }
+
+        public long getSalary() {
+            return salary;
+        }
+
+        public void setSalary(long salary) {
+            this.salary = salary;
+        }
+    }
+  learner_created: true
+- name: src/account/exceptions/CustomAuthenticationEntryPoint.java
+  visible: true
+  text: |-
+    package account.exceptions;
+
+    import account.entities.Event;
+    import account.entities.Events;
+    import account.services.EventService;
+    import account.services.UserService;
+    import com.fasterxml.jackson.databind.ObjectMapper;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.security.core.AuthenticationException;
+    import org.springframework.security.web.AuthenticationEntryPoint;
+    import org.springframework.stereotype.Component;
+
+    import javax.servlet.http.HttpServletRequest;
+    import javax.servlet.http.HttpServletResponse;
+    import java.io.IOException;
+    import java.io.Serializable;
+    import java.time.LocalDateTime;
+
+    import  java.util.Base64;
+    import java.util.LinkedHashMap;
+
+
+    @Component
+    public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint, Serializable {
+
+
+        private final EventService eventService;
+        private final UserService userService;
+        private ObjectMapper objectMapper = new ObjectMapper();
+
+        @Autowired
+        public CustomAuthenticationEntryPoint(EventService eventService, UserService userService) {
+            this.eventService = eventService;
+            this.userService = userService;
+        }
+
+    //    private static final long serialVersionUID = -8970718410437077606L;
+
+    //    @Autowired  // the Jackson object mapper bean we created in the config
+    //    private Jackson2JsonObjectMapper jackson2JsonObjectMapper;
+
+        @Override
+        public void commence(HttpServletRequest request,
+                             HttpServletResponse response,
+                             AuthenticationException e) throws IOException {
+
+
+            // FIX IT!
+            //request.getRequestURI()
+            // request.getHeader("authorization")  name:password base64
+
+            if (request.getHeader("authorization") != null) {
+                byte[] decodedBytes = Base64.getDecoder().decode(request.getHeader("authorization").substring(6));
+                String decodedString = new String(decodedBytes);
+                String[] userPassword = decodedString.split(":");
+                String username = userPassword[0];
+
+                if (!e.getMessage().equals("User account is locked")) {
+
+                    Event event = new Event(LocalDateTime.now(), Events.LOGIN_FAILED.toString(), username, request.getRequestURI(), request.getRequestURI());
+                    eventService.save(event);
+
+                    if (userService.loginFailed(username)) { // locked user
+
+                        LinkedHashMap<String, Object> data = new LinkedHashMap<>();
+                        data.put("timestamp", LocalDateTime.now().toString());
+                        data.put("status", HttpStatus.UNAUTHORIZED.value());
+                        data.put("error", "Unauthorized");
+                        data.put("message", "User account is locked");
+                        data.put("path", request.getRequestURI());
+
+                        response.getOutputStream().println(objectMapper.writeValueAsString(data));
+
+                        //                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User account is locked");
+                    }
+                } else {
+                    // если юзер залочен, в лог писать не нужно, но нужно вернуть не пустое тело ответа.
+                    LinkedHashMap<String, Object> data = new LinkedHashMap<>();
+                    data.put("timestamp", LocalDateTime.now().toString());
+                    data.put("status", HttpStatus.UNAUTHORIZED.value());
+                    data.put("error", "Unauthorized");
+                    data.put("message", "User account is locked");
+                    data.put("path", request.getRequestURI());
+
+                    response.getOutputStream().println(objectMapper.writeValueAsString(data));
+
+                }
+            }
+
+    //        Event event = new Event(LocalDateTime.now(), Events.LOGIN_FAILED.toString(), userPassword[0], "/api/empl/payment", "/api/empl/payment");
+
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+    //        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+
+            /*
+              This is a pojo you can create to hold the repsonse code, error, and description.
+              You can create a POJO to hold whatever information you want to send back.
+            */
+    //        CustomError error = new CustomError(HttpStatus.FORBIDDEN, error, description);
+
+            /*
+              Here we're going to creat a json strong from the CustomError object we just created.
+              We set the media type, encoding, and then get the write from the response object and write
+          our json string to the response.
+            */
+    //        try {
+    ////            String json = jackson2JsonObjectMapper.toJson(error);
+    //            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    //            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+    //            response.setCharacterEncoding(StandardCharsets.UTF_8.toString());
+    ////            response.getWriter().write(json);
+    //        } catch (Exception e1) {
+    //            e1.printStackTrace();
+    //        }
+
+        }
+    }
+
+
+    //@Component
+    //public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
+    //
+    //    @Override
+    //    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
+    //        // This is invoked when user tries to access a secured REST resource without supplying any credentials
+    //        // We should just send a 401 Unauthorized response because there is no 'login page' to redirect to
+    //        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+    //    }
+    //}
+  learner_created: true
+- name: src/account/services/UserService.java
+  visible: true
+  text: |
+    package account.services;
+
+    import account.dto.UserAccessDTO;
+    import account.dto.UserDTO;
+    import account.dto.UserDTO2;
+    import account.dto.UserRoleDTO;
+    import account.entities.Event;
+    import account.entities.Events;
+    import account.entities.Role;
+    import account.entities.User;
+    import account.exceptions.AccountServiceException;
+    import account.exceptions.NotFoundException;
+    import account.repositories.UserRepository;
+    import org.modelmapper.ModelMapper;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.security.core.Authentication;
+    import org.springframework.security.core.context.SecurityContextHolder;
+    import org.springframework.security.core.userdetails.UserDetails;
+    import org.springframework.security.core.userdetails.UserDetailsService;
+    import org.springframework.security.core.userdetails.UsernameNotFoundException;
+    import org.springframework.security.crypto.password.PasswordEncoder;
+    import org.springframework.stereotype.Service;
+    import org.springframework.transaction.annotation.Transactional;
+
+    import java.time.LocalDateTime;
+    import java.util.*;
+
+    @Service
+    @Transactional(readOnly = true)
+    public class UserService implements UserDetailsService {
+
+        private final UserRepository userRepository;
+        private final EventService eventService;
+        private final PasswordEncoder passwordEncoder;
+        private final ModelMapper modelMapper;
+
+        @Autowired
+        public UserService(UserRepository userRepository, EventService eventService, PasswordEncoder passwordEncoder, ModelMapper modelMapper) {
+            this.userRepository = userRepository;
+            this.eventService = eventService;
+            this.passwordEncoder = passwordEncoder;
+            this.modelMapper = modelMapper;
+        }
+
+        @Override
+        public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+    //        Optional<User> user = userRepository.findByUsername(s);
+            Optional<User> user = userRepository.findByUsername(s.toLowerCase());
+
+            if (user.isPresent()){
+                return user.get();
+            } else {
+                throw new UsernameNotFoundException(String.format("Username[%s] not found"));
+            }
+        }
+
+        public Optional<User> findByUsername(String username) {
+            return userRepository.findByUsername(username.toLowerCase());
+        }
+
+        public List<UserDTO2> findAllUsers() {
+            List<User> users = userRepository.findAll();
+            List<UserDTO2> usersDTO2List = new ArrayList<>();
+
+            for (User user : users) {
+                usersDTO2List.add(modelMapper.map(user, UserDTO2.class));
+            }
+
+            return usersDTO2List;
+        }
+
+
+
+    //    @Override
+    //    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    //        Optional<Person> person = peopleRepository.findByUsername(username);
+    //
+    //        if (person.isEmpty()) {
+    //            throw new UsernameNotFoundException("User not found");
+    //        }
+    //
+    //        return new PersonDetails(person.get());
+    //    }
+
+        @Transactional
+        public void delete(User user) {
+            userRepository.delete(user);
+        }
+
+        @Transactional
+        public UserDTO2 create(UserDTO userDTO) {
+
+            String password = userDTO.getPassword();
+            if (isPasswordInBreachedList(password)) {
+                throw new AccountServiceException("The password is in the hacker's database!");
+            }
+
+            String username = userDTO.getEmail().toLowerCase();
+            Optional<User> optionalUser = userRepository.findByUsername(username);
+
+            if (optionalUser.isPresent()) {
+                throw new AccountServiceException("User exist!");
+            }
+
+            User user = modelMapper.map(userDTO, User.class);
+            enrichUser(user);
+            userRepository.save(user);
+
+            Event event = new Event(LocalDateTime.now(), Events.CREATE_USER.toString(), "Anonymous", username, "/api/auth/signup");
+            eventService.save(event);
+
+            return modelMapper.map(user, UserDTO2.class);
+        }
+
+        @Transactional
+        public void delete(String userEmail) {
+
+            Optional<User> optionalUser = userRepository.findByUsername(userEmail.toLowerCase());
+
+            if (optionalUser.isEmpty()) {
+                throw new NotFoundException("User not found!");
+            }
+
+            User user = optionalUser.get();
+
+            if (user.getRoles().contains(Role.ROLE_ADMINISTRATOR)) {
+                throw new AccountServiceException("Can't remove ADMINISTRATOR role!");
+            }
+
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            User userAction = (User) auth.getPrincipal();
+
+            Event event = new Event(LocalDateTime.now(), Events.DELETE_USER.toString(), userAction.getUsername(), user.getUsername(), "/api/admin/user");
+            eventService.save(event);
+
+            // TODO FIX IT!
+            userRepository.delete(user);
+        }
+
+        @Transactional
+        public UserDTO2 setRole(UserRoleDTO userRoleDTO) {
+
+            String username = userRoleDTO.getUser().toLowerCase();
+            Optional<User> optionalUser = userRepository.findByUsername(username);
+
+            if (optionalUser.isEmpty()) {
+                throw new NotFoundException("User not found!");
+            }
+
+            User user = optionalUser.get();
+            Role role = null;
+
+            try {
+                role = Role.valueOf("ROLE_" + userRoleDTO.getRole());
+            } catch (Exception e) {
+                throw new NotFoundException("Role not found!");
+            }
+
+
+            String objectStr = null;
+            Events eventRole = null;
+            if ("REMOVE".equals(userRoleDTO.getOperation())) {
+
+                if (Role.ROLE_ADMINISTRATOR.equals(role)) {
+                    throw new AccountServiceException("Can't remove ADMINISTRATOR role!");
+                }
+
+                if (!user.getRoles().contains(role)) {
+                    throw new AccountServiceException("The user does not have a role!");
+                }
+
+                if (user.getRoles().size() == 1) {
+                    throw new AccountServiceException("The user must have at least one role!");
+                }
+
+                user.getRoles().remove(role);
+
+                objectStr = "Remove role " + role.toString().substring(5) + " from " + username;
+                eventRole = Events.REMOVE_ROLE;
+            } else {
+
+                if ((Role.ROLE_ADMINISTRATOR.equals(role) && (user.getRoles().contains(Role.ROLE_USER) || user.getRoles().contains(Role.ROLE_ACCOUNTANT)))
+                        || (Role.ROLE_ACCOUNTANT.equals(role) && user.getRoles().contains(Role.ROLE_ADMINISTRATOR))
+                        || (Role.ROLE_AUDITOR.equals(role) && user.getRoles().contains(Role.ROLE_ADMINISTRATOR))
+                        || (Role.ROLE_USER.equals(role) && user.getRoles().contains(Role.ROLE_ADMINISTRATOR))) {
+                    throw new AccountServiceException("The user cannot combine administrative and business roles!");
+                }
+
+                user.getRoles().add(role);
+                objectStr = "Grant role " + role.toString().substring(5) + " to " + username;
+                eventRole = Events.GRANT_ROLE;
+            }
+
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            User userAction = (User) auth.getPrincipal();
+
+            Event event = new Event(LocalDateTime.now(), eventRole.toString(), userAction.getUsername(), objectStr, "/api/admin/user/role");
+            eventService.save(event);
+
+            return modelMapper.map(user, UserDTO2.class);
+        }
+
+        @Transactional
+        public String setAccess(UserAccessDTO userAccessDTO) {
+
+            String username = userAccessDTO.getUser().toLowerCase();
+            String status = "User " + username;
+            Optional<User> optionalUser = userRepository.findByUsername(username);
+
+            if (optionalUser.isEmpty()) {
+                throw new NotFoundException("User not found!");
+            }
+
+            User user = optionalUser.get();
+
+    //        Role role = null;
+    //
+    //        try {
+    //            role = Role.valueOf("ROLE_" + userRoleDTO.getRole());
+    //        } catch (Exception e) {
+    //            throw new NotFoundException("Role not found!");
+    //        }
+
+            if ("LOCK".equals(userAccessDTO.getOperation())) {
+                status += " locked!";
+
+                if (user.getRoles().contains(Role.ROLE_ADMINISTRATOR)) {
+                    throw new AccountServiceException("Can't lock the ADMINISTRATOR!");
+                }
+
+    //            if (!user.getRoles().contains(role)) {
+    //                throw new AccountServiceException("The user does not have a role!");
+    //            }
+    //
+    //            if (user.getRoles().size() == 1) {
+    //                throw new AccountServiceException("The user must have at least one role!");
+    //            }
+
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                User userAction = (User) auth.getPrincipal();
+
+                Event event = new Event(LocalDateTime.now(), Events.UNLOCK_USER.toString(), userAction.getUsername(), "Lock user " + user.getUsername(), "/api/admin/user/access");
+                eventService.save(event);
+
+                user.setAccountNonLocked(false);
+            } else {
+                status += " unlocked!";
+
+    //            if ((Role.ROLE_ADMINISTRATOR.equals(role) && (user.getRoles().contains(Role.ROLE_USER) || user.getRoles().contains(Role.ROLE_ACCOUNTANT)))
+    //                    || (Role.ROLE_ACCOUNTANT.equals(role) && user.getRoles().contains(Role.ROLE_ADMINISTRATOR))
+    //                    || (Role.ROLE_USER.equals(role) && user.getRoles().contains(Role.ROLE_ADMINISTRATOR))) {
+    //                throw new AccountServiceException("The user cannot combine administrative and business roles!");
+    //            }
+
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                User userAction = (User) auth.getPrincipal();
+
+                Event event = new Event(LocalDateTime.now(), Events.UNLOCK_USER.toString(), userAction.getUsername(), "Unlock user " + user.getUsername(), "/api/admin/user/access");
+                eventService.save(event);
+
+                user.setAccountNonLocked(true);
+                user.setFailedLogin(0);
+            }
+
+            return status;
+        }
+
+
+        @Transactional
+        public void savePassword(User user, String password) {
+            user.setPassword(passwordEncoder.encode(password));
+            userRepository.save(user);
+        }
+
+        @Transactional
+        public void save(User user) {
+            enrichUser(user);
+
+            userRepository.save(user);
+        }
+
+        private void enrichUser(User user) {
+            user.setUsername(user.getEmail().toLowerCase());
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+            if (userRepository.count() == 0) {
+                user.setRoles(Collections.singletonList(Role.ROLE_ADMINISTRATOR));
+            } else {
+                user.setRoles(Collections.singletonList(Role.ROLE_USER));
+            }
+        }
+
+        public static boolean isPasswordInBreachedList(String password) {
+
+            String[] breachedList = new String[] {"PasswordForJanuary", "PasswordForFebruary", "PasswordForMarch", "PasswordForApril",
+                    "PasswordForMay", "PasswordForJune", "PasswordForJuly", "PasswordForAugust", "PasswordForSeptember",
+                    "PasswordForOctober", "PasswordForNovember", "PasswordForDecember"};
+
+            for (var breachedPassword : breachedList) {
+                if (breachedPassword.equals(password)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        @Transactional
+        public Map<String, String> changePassword(String password) {
+
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            User user = (User) auth.getPrincipal();
+
+            if (isPasswordInBreachedList(password)) {
+                throw new AccountServiceException("The password is in the hacker's database!");
+            }
+
+            if (passwordEncoder.matches(password, user.getPassword())) {
+                throw new AccountServiceException("The passwords must be different!");
+            }
+
+            user.setPassword(passwordEncoder.encode(password));
+            userRepository.save(user);
+
+            Event event = new Event(LocalDateTime.now(), Events.CHANGE_PASSWORD.toString(), user.getUsername(), user.getUsername(), "/api/auth/changepass");
+            eventService.save(event);
+
+            Map<String, String> response = new LinkedHashMap<>();
+            response.put("email", user.getUsername());
+            response.put("status", "The password has been updated successfully");
+
+            return response;
+        }
+
+        @Transactional
+        public boolean loginFailed(String username) {
+
+            Optional<User> optionalUser = userRepository.findByUsername(username);
+
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+
+                int failedLogin = user.getFailedLogin() + 1;
+                user.setFailedLogin(failedLogin);
+                if (failedLogin > 5 && !user.getRoles().contains(Role.ROLE_ADMINISTRATOR)) {
+
+                    Event event = new Event(LocalDateTime.now(), Events.BRUTE_FORCE.toString(), user.getUsername(), "/api/empl/payment", "/api/empl/payment");
+                    eventService.save(event);
+
+                    Event event2 = new Event(LocalDateTime.now(), Events.LOCK_USER.toString(), user.getUsername(), "Lock user " + user.getUsername(), "/api/admin/user/access");
+                    eventService.save(event2);
+
+                    user.setAccountNonLocked(false);
+                    return true;
+                }
+
+            }
+
+            return false;
+        }
+    }
+  learner_created: true
+- name: src/account/repositories/EmployeeRepository.java
+  visible: true
+  text: |
+    package account.repositories;
+
+    import account.entities.Employee;
+    import org.springframework.data.jpa.repository.JpaRepository;
+    import org.springframework.data.repository.query.Param;
+    import org.springframework.stereotype.Repository;
+
+    import java.util.List;
+
+    @Repository
+    public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+        Employee findEmployeeById(Long id);
+        List<Employee> findByEmployee(@Param("employee") String employee);
+        Employee findEmployeeByEmployee(String employee);
+    }
+  learner_created: true
+- name: src/account/repositories/UserRepository.java
+  visible: true
+  text: |
+    package account.repositories;
+
+    import account.entities.User;
+    import org.springframework.data.jpa.repository.JpaRepository;
+
+    import java.util.Optional;
+
+    public interface UserRepository extends JpaRepository<User, Long> {
+
+        Optional<User> findByUsername(String username);
+    }
+  learner_created: true
+- name: src/account/dto/EmployeeSendDTO.java
+  visible: true
+  text: |
+    package account.dto;
+
+    public class EmployeeSendDTO {
+
+        private String name;
+        private String lastname;
+        private String period;
+        private String salary;
+
+        public EmployeeSendDTO() {
+        }
+
+        public EmployeeSendDTO(String name, String lastname, String period, String salary) {
+            this.name = name;
+            this.lastname = lastname;
+            this.period = period;
+            this.salary = salary;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getLastname() {
+            return lastname;
+        }
+
+        public void setLastname(String lastname) {
+            this.lastname = lastname;
+        }
+
+        public String getPeriod() {
+            return period;
+        }
+
+        public void setPeriod(String period) {
+            this.period = period;
+        }
+
+        public String getSalary() {
+            return salary;
+        }
+
+        public void setSalary(String salary) {
+            this.salary = salary;
+        }
+    }
+  learner_created: true
+- name: src/account/dto/UserDTO2.java
+  visible: true
+  text: |
+    package account.dto;
+
+    import account.entities.Role;
+
+    import java.util.Comparator;
+    import java.util.LinkedList;
+    import java.util.List;
+
+    public class UserDTO2 {
+
+        private int id;
+        private String name;
+        private String lastname;
+        private String email;
+        private LinkedList<Role> roles;
+    //    private List<Role> roles;
+
+        public UserDTO2() {
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getLastname() {
+            return lastname;
+        }
+
+        public void setLastname(String lastname) {
+            this.lastname = lastname;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email.toLowerCase();
+        }
+
+        public List<Role> getRoles() {
+            return roles;
+        }
+
+    //    public void setRoles(List<Role> roles) {
+        public void setRoles(LinkedList<Role> roles) {
+            this.roles = roles;
+            this.roles.sort(Comparator.naturalOrder());
+        }
+    }
+  learner_created: true
+- name: src/account/services/EmployeeService.java
+  visible: true
+  text: |
+    package account.services;
+
+    import account.dto.EmployeeReceiveDTO;
+    import account.entities.Employee;
+    import account.exceptions.AccountServiceException;
+    import account.repositories.EmployeeRepository;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.data.repository.query.Param;
+    import org.springframework.stereotype.Service;
+
+    import java.util.HashSet;
+    import java.util.List;
+    import java.util.Set;
+
+    @Service
+    public class EmployeeService {
+
+        private final EmployeeRepository employeeRepository;
+
+        @Autowired
+        public EmployeeService(EmployeeRepository employeeRepository) {
+            this.employeeRepository = employeeRepository;
+        }
+
+        public Employee findEmployeeById(Long id) {
+            return employeeRepository.findEmployeeById(id);
+        }
+
+        public Employee findEmployeeByEmployee(String employee) {
+            return employeeRepository.findEmployeeByEmployee(employee);
+        }
+
+        public List<Employee> findByEmployee(@Param("employee") String employee) {
+            return employeeRepository.findByEmployee(employee);
+        }
+
+        public Employee save(Employee toSave) {
+            return employeeRepository.save(toSave);
+        }
+
+        public String getPeriodString(String period) {
+            String [] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+            String[] periodParts = period.split("-");
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(months[Integer.parseInt(periodParts[0]) - 1]);
+            sb.append("-");
+            sb.append(periodParts[1]);
+
+            return sb.toString();
+        }
+
+        public String getSalaryString(long salary) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(salary / 100);
+            sb.append(" dollar(s) ");
+            sb.append(salary % 100);
+            sb.append(" cent(s)");
+
+            return sb.toString();
+        }
+
+        public void checkDuplicates(List<EmployeeReceiveDTO> employees) {
+
+            class EmployeeDuplicates {
+                private String employee;
+                private String period;
+
+                public EmployeeDuplicates(String employee, String period) {
+                    this.employee = employee;
+                    this.period = period;
+                }
+
+                @Override
+                public boolean equals(Object o) {
+                    if (this == o) return true;
+                    if (o == null || getClass() != o.getClass()) return false;
+
+                    EmployeeDuplicates that = (EmployeeDuplicates) o;
+
+                    if (!employee.equals(that.employee)) return false;
+                    return period.equals(that.period);
+                }
+
+                @Override
+                public int hashCode() {
+                    int result = employee.hashCode();
+                    result = 31 * result + period.hashCode();
+                    return result;
+                }
+            }
+
+            Set<EmployeeDuplicates> addedEmployees = new HashSet<>();
+            for (var employee : employees) {
+                EmployeeDuplicates duplicate = new EmployeeDuplicates(employee.getEmployee(), employee.getPeriod());
+                if (addedEmployees.contains(duplicate)) {
+                    throw new AccountServiceException("Duplicated entry in payment list!");
+                }
+                addedEmployees.add(duplicate);
+            }
+        }
+    }
+  learner_created: true
+- name: src/account/exceptions/RestExceptionHandler.java
+  visible: true
+  text: |
+    package account.exceptions;
+
+    import account.exceptions.models.ErrorModel;
+    import org.springframework.http.HttpHeaders;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.http.ResponseEntity;
+    import org.springframework.web.bind.MethodArgumentNotValidException;
+    import org.springframework.web.bind.annotation.ExceptionHandler;
+    import org.springframework.web.bind.annotation.RestControllerAdvice;
+    import org.springframework.web.context.request.WebRequest;
+    import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+    import javax.validation.ConstraintViolationException;
+    import java.util.ArrayList;
+    import java.util.List;
+
+
+    @RestControllerAdvice
+    public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+
+        @Override
+        public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+            List<String> errorMessages = new ArrayList<>();
+            for (var error : ex.getBindingResult().getAllErrors()) {
+                errorMessages.add(error.getDefaultMessage());
+            }
+
+            String message = (errorMessages.size() == 1) ? errorMessages.get(0) : errorMessages.toString();
+            ErrorModel error = new ErrorModel(HttpStatus.BAD_REQUEST.value(), message, request.getDescription(false));
+
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
+
+        // handle error in List (@RequestBody List<@Valid ReceiveEmployee> receiveEmployee)
+        @ExceptionHandler(ConstraintViolationException.class)
+        protected ResponseEntity<ErrorModel> handleConstraintViolationException(ConstraintViolationException ex, WebRequest request) {
+            List<String> errorMessages = new ArrayList<>();
+            for (var error : ex.getConstraintViolations()) {
+                errorMessages.add(error.getMessage());
+            }
+
+            String message = (errorMessages.size() == 1) ? errorMessages.get(0) : errorMessages.toString();
+            ErrorModel error = new ErrorModel(HttpStatus.BAD_REQUEST.value(), message, request.getDescription(false));
+
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
+
+        @ExceptionHandler(AccountServiceException.class)
+        protected ResponseEntity<ErrorModel> handleAccountServiceException(AccountServiceException ex, WebRequest request) {
+            ErrorModel error = new ErrorModel(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), request.getDescription(false));
+
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
+
+        @ExceptionHandler(NotFoundException.class)
+        protected ResponseEntity<ErrorModel> handleUserFoundException(NotFoundException ex, WebRequest request) {
+            ErrorModel error = new ErrorModel(HttpStatus.NOT_FOUND.value(), ex.getMessage(), request.getDescription(false), "Not Found");
+
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        }
+    }
+  learner_created: true
+- name: src/account/entities/User.java
+  visible: true
+  text: |
+    package account.entities;
+
+    import org.springframework.security.core.GrantedAuthority;
+    import org.springframework.security.core.authority.SimpleGrantedAuthority;
+    import org.springframework.security.core.userdetails.UserDetails;
+
+    import javax.persistence.*;
+    import javax.validation.constraints.NotBlank;
+    import javax.validation.constraints.Size;
+    import java.util.ArrayList;
+    import java.util.List;
+
+    @Entity
+    public class User implements UserDetails {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.AUTO)
+        private Long id;
+
+        private String username;
+        private String name;
+        private String lastname;
+        private String email;
+
+        @NotBlank
+        @Size(min = 12)
+        private String password;
+
+        private int failedLogin;
+
+        private boolean accountNonExpired;
+
+        private boolean accountNonLocked;
+
+        private boolean credentialsNonExpired;
+
+        private boolean enabled;
+
+        @Enumerated(EnumType.STRING)
+        @ElementCollection(fetch = FetchType.EAGER)
+        private List<Role> roles;
+
+        public User() {
+            this.accountNonExpired = true;
+            this.accountNonLocked = true;
+            this.credentialsNonExpired = true;
+            this.enabled = true;
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        @Override
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            //this.username = username;
+            this.username = username.toLowerCase();
+        }
+
+        @Override
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getLastname() {
+            return lastname;
+        }
+
+        public void setLastname(String lastname) {
+            this.lastname = lastname;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
+
+        @Override
+        public boolean isAccountNonExpired() {
+            return accountNonExpired;
+        }
+
+        @Override
+        public boolean isAccountNonLocked() {
+            return accountNonLocked;
+        }
+
+        @Override
+        public boolean isCredentialsNonExpired() {
+            return credentialsNonExpired;
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return true;
+        }
+
+        public void grantAuthority(Role authority) {
+            if (roles == null) {
+                roles = new ArrayList<>();
+            }
+            roles.add(authority);
+        }
+
+        @Override
+        public List<GrantedAuthority> getAuthorities(){
+            List<GrantedAuthority> authorities = new ArrayList<>();
+            roles.forEach(role -> authorities.add(new SimpleGrantedAuthority(role.toString())));
+            return authorities;
+        }
+
+        public List<Role> getRoles() {
+            return roles;
+        }
+
+        public void setRoles(List<Role> roles) {
+            this.roles = roles;
+        }
+
+        public void setAccountNonLocked(boolean accountNonLocked) {
+            this.accountNonLocked = accountNonLocked;
+        }
+
+        public int getFailedLogin() {
+            return failedLogin;
+        }
+
+        public void setFailedLogin(int failedLogin) {
+            this.failedLogin = failedLogin;
+        }
+    }
+  learner_created: true
+- name: src/account/entities/Role.java
+  visible: true
+  text: |
+    package account.entities;
+
+    public enum Role {
+        ROLE_ACCOUNTANT,
+        ROLE_ADMINISTRATOR,
+        ROLE_ANONYMOUS,
+        ROLE_AUDITOR,
+        ROLE_USER;
+    }
+  learner_created: true
+- name: src/account/controllers/AccountController.java
+  visible: true
+  text: |
+    package account.controllers;
+
+    import account.dto.EmployeeSendDTO;
+    import account.entities.Employee;
+    import account.entities.User;
+    import account.exceptions.AccountServiceException;
+    import account.services.EmployeeService;
+    import account.dto.EmployeeReceiveDTO;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.security.core.Authentication;
+    import org.springframework.security.core.context.SecurityContextHolder;
+    import org.springframework.web.bind.annotation.*;
+
+    import javax.validation.Valid;
+    import java.util.Comparator;
+    import java.util.LinkedList;
+    import java.util.List;
+    import java.util.Map;
+
+    @RestController
+    public class AccountController {
+
+        @Autowired
+        EmployeeService employeeService ;
+
+        @GetMapping("/api/empl/payment")
+        public Object getPayroll(@RequestParam(required = false) String period) {
+    //    public Object getPayroll(@RequestParam(required = false) @Pattern(regexp = "(0[1-9]|1[0-2])-\\d{4}", message = "Wrong date in request!") String period) {
+            // XXX
+            // pattern annotation doesn't work
+
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            User user = (User) auth.getPrincipal();
+            List<Employee> employees = employeeService.findByEmployee(user.getUsername());
+
+            if (period == null) {
+
+                List<EmployeeSendDTO> sendEmployees = new LinkedList<>();
+                employees.sort(Comparator.comparing(Employee::getPeriod).reversed());
+                for (var employee : employees) {
+                    EmployeeSendDTO sendEmployee = new EmployeeSendDTO(user.getName(), user.getLastname(),
+                            employeeService.getPeriodString(employee.getPeriod()), employeeService.getSalaryString(employee.getSalary()));
+
+                    sendEmployees.add(sendEmployee);
+                }
+
+                return sendEmployees;
+            } else {
+
+                if (!period.matches("(0[1-9]|1[0-2])-\\d{4}")) {
+                    throw new AccountServiceException("Wrong date in request!");
+                }
+
+                for (var employee : employees) {
+                    if (period.equals(employee.getPeriod())) {
+                        return new EmployeeSendDTO(user.getName(), user.getLastname(), employeeService.getPeriodString(employee.getPeriod()),
+                                employeeService.getSalaryString(employee.getSalary()));
+                    }
+                }
+
+                return Map.of("status", "Error! No information for this period.");
+            }
+        }
+
+        @PutMapping("/api/acct/payments")
+        public Map<String, Object> changeSalary(@Valid @RequestBody EmployeeReceiveDTO receiveEmployee) {
+
+            List<Employee> employees = employeeService.findByEmployee(receiveEmployee.getEmployee().toLowerCase());
+            for (var employee : employees) {
+                if (receiveEmployee.getPeriod().equals(employee.getPeriod())) {
+                    employee.setEmployee(receiveEmployee.getEmployee().toLowerCase());
+                    employee.setPeriod(receiveEmployee.getPeriod());
+                    employee.setSalary(receiveEmployee.getSalary());
+                    employeeService.save(employee);
+
+                    return Map.of("status", "Updated successfully!");
+                }
+            }
+
+            return Map.of("status", "Error! No information for this period.");
+        }
+
+        @PostMapping("/api/acct/payments")
+        public Map<String, Object> uploadsPayrolls(@RequestBody List<@Valid EmployeeReceiveDTO> receiveEmployee) {
+
+            // XXX
+            // for this JSON (error in "period":"13-2021")
+            // [{"employee":"johndoe@acme.com","period":"13-2021","salary":123456}]
+            // @Pattern didn't check value of 'period' field
+            // but the field check is triggered when writing to the database object of Employee class.
+
+            employeeService.checkDuplicates(receiveEmployee);
+
+            for (var newEmployee : receiveEmployee) {
+                Employee employee = new Employee();
+                employee.setEmployee(newEmployee.getEmployee().toLowerCase());
+                employee.setPeriod(newEmployee.getPeriod());
+                employee.setSalary(newEmployee.getSalary());
+                employeeService.save(employee);
+            }
+
+            return Map.of("status", "Added successfully!");
+        }
+    }
+  learner_created: true
+- name: src/resources/keystore/1.cmd
+  visible: true
+  learner_created: true
+- name: src/resources/keystore/1.txt
+  visible: true
+  learner_created: true
+- name: src/resources/keystore/keystore.p12
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/16607#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Well done! You've finished the project. Select a new project on <a href="https://hyperskill.org/projects">JetBrains
+    Academy</a> to continue learning.
+  time: Thu, 08 Sep 2022 11:58:28 UTC
 record: -1

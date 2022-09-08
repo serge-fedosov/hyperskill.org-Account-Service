@@ -1,0 +1,1 @@
+"C:\Program Files\Java\jdk1.8.0_261\bin\keytool" -genkeypair -alias accountant_service -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore keystore.p12 -validity 3650
