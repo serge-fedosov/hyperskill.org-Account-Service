@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,5 +50,12 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorModel error = new ErrorModel(HttpStatus.BAD_REQUEST.value(), ex.getMessage(), request.getDescription(false));
 
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    protected ResponseEntity<ErrorModel> handleUserFoundException(NotFoundException ex, WebRequest request) {
+        ErrorModel error = new ErrorModel(HttpStatus.NOT_FOUND.value(), ex.getMessage(), request.getDescription(false), "Not Found");
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 }

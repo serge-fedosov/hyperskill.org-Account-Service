@@ -1,6 +1,9 @@
 package account.entities;
 
 public enum Role {
-    ROLE_USER,
-    ROLE_ADMIN
+    ROLE_ACCOUNTANT,
+    ROLE_ADMINISTRATOR,
+    ROLE_ANONYMOUS,
+    ROLE_AUDITOR,
+    ROLE_USER;
 }

@@ -1,17 +1,17 @@
 package account.controllers;
 
+import account.dto.EmployeeSendDTO;
 import account.entities.Employee;
 import account.entities.User;
 import account.exceptions.AccountServiceException;
 import account.services.EmployeeService;
-import account.services.ReceiveEmployee;
+import account.dto.EmployeeReceiveDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,10 +35,10 @@ public class AccountController {
 
         if (period == null) {
 
-            List<SendEmployee> sendEmployees = new LinkedList<>();
+            List<EmployeeSendDTO> sendEmployees = new LinkedList<>();
             employees.sort(Comparator.comparing(Employee::getPeriod).reversed());
             for (var employee : employees) {
-                SendEmployee sendEmployee = new SendEmployee(user.getName(), user.getLastname(),
+                EmployeeSendDTO sendEmployee = new EmployeeSendDTO(user.getName(), user.getLastname(),
                         employeeService.getPeriodString(employee.getPeriod()), employeeService.getSalaryString(employee.getSalary()));
 
                 sendEmployees.add(sendEmployee);
@@ -53,7 +53,7 @@ public class AccountController {
 
             for (var employee : employees) {
                 if (period.equals(employee.getPeriod())) {
-                    return new SendEmployee(user.getName(), user.getLastname(), employeeService.getPeriodString(employee.getPeriod()),
+                    return new EmployeeSendDTO(user.getName(), user.getLastname(), employeeService.getPeriodString(employee.getPeriod()),
                             employeeService.getSalaryString(employee.getSalary()));
                 }
             }
@@ -63,7 +63,7 @@ public class AccountController {
     }
 
     @PutMapping("/api/acct/payments")
-    public Map<String, Object> changeSalary(@Valid @RequestBody ReceiveEmployee receiveEmployee) {
+    public Map<String, Object> changeSalary(@Valid @RequestBody EmployeeReceiveDTO receiveEmployee) {
 
         List<Employee> employees = employeeService.findByEmployee(receiveEmployee.getEmployee().toLowerCase());
         for (var employee : employees) {
@@ -81,7 +81,7 @@ public class AccountController {
     }
 
     @PostMapping("/api/acct/payments")
-    public Map<String, Object> uploadsPayrolls(@RequestBody List<@Valid ReceiveEmployee> receiveEmployee) {
+    public Map<String, Object> uploadsPayrolls(@RequestBody List<@Valid EmployeeReceiveDTO> receiveEmployee) {
 
         // XXX
         // for this JSON (error in "period":"13-2021")
@@ -100,55 +100,5 @@ public class AccountController {
         }
 
         return Map.of("status", "Added successfully!");
-    }
-}
-
-class SendEmployee {
-
-    private String name;
-    private String lastname;
-    private String period;
-    private String salary;
-
-    public SendEmployee() {
-    }
-
-    public SendEmployee(String name, String lastname, String period, String salary) {
-        this.name = name;
-        this.lastname = lastname;
-        this.period = period;
-        this.salary = salary;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
-    }
-
-    public String getPeriod() {
-        return period;
-    }
-
-    public void setPeriod(String period) {
-        this.period = period;
-    }
-
-    public String getSalary() {
-        return salary;
-    }
-
-    public void setSalary(String salary) {
-        this.salary = salary;
     }
 }

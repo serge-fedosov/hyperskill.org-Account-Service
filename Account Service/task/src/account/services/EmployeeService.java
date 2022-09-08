@@ -1,5 +1,6 @@
 package account.services;
 
+import account.dto.EmployeeReceiveDTO;
 import account.entities.Employee;
 import account.exceptions.AccountServiceException;
 import account.repositories.EmployeeRepository;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 
 @Service
 public class EmployeeService {
@@ -60,7 +60,7 @@ public class EmployeeService {
         return sb.toString();
     }
 
-    public void checkDuplicates(List<ReceiveEmployee> employees) {
+    public void checkDuplicates(List<EmployeeReceiveDTO> employees) {
 
         class EmployeeDuplicates {
             private String employee;

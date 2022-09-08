@@ -26,6 +26,8 @@ public class User implements UserDetails {
     @Size(min = 12)
     private String password;
 
+    private int failedLogin;
+
     private boolean accountNonExpired;
 
     private boolean accountNonLocked;
@@ -130,4 +132,23 @@ public class User implements UserDetails {
         return authorities;
     }
 
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
+
+    public void setAccountNonLocked(boolean accountNonLocked) {
+        this.accountNonLocked = accountNonLocked;
+    }
+
+    public int getFailedLogin() {
+        return failedLogin;
+    }
+
+    public void setFailedLogin(int failedLogin) {
+        this.failedLogin = failedLogin;
+    }
 }

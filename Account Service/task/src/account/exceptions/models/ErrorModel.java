@@ -25,6 +25,12 @@ public class ErrorModel {
         this.path = path;
     }
 
+    public ErrorModel(int status, String message, String path, String error) {
+        this(status, message, path);
+
+        this.error = error;
+    }
+
     public int getStatus() {
         return status;
     }

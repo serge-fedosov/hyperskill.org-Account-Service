@@ -1,10 +1,10 @@
-package account.services;
+package account.dto;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
-public class ReceiveEmployee {
+public class EmployeeReceiveDTO {
 
     @NotBlank(message = "Empty employee field!")
     private String employee;
@@ -15,10 +15,10 @@ public class ReceiveEmployee {
     @Min(value = 0, message = "Salary cannot be negative")
     private long salary;
 
-    public ReceiveEmployee() {
+    public EmployeeReceiveDTO() {
     }
 
-    public ReceiveEmployee(String employee, String period, long salary) {
+    public EmployeeReceiveDTO(String employee, String period, long salary) {
         this.employee = employee;
         this.period = period;
         this.salary = salary;
@@ -48,4 +48,3 @@ public class ReceiveEmployee {
         this.salary = salary;
     }
 }
-
